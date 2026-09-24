@@ -36,8 +36,8 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         // 開発版と公開版が同じ端末に入っても別アプリとして扱われるようにする。
-        // インストール済みのアプリを引き継ぐため、アプリ名を変えてもこの値は変えない
-        id: `photo-katsudou-${channel}`,
+        // 公開後はインストール済みのアプリを引き継ぐため、この値は変えない
+        id: `demi-camera-${channel}`,
         name: appName,
         short_name: shortName,
         description: '好きなフレームを重ねて撮影できるカメラアプリ',

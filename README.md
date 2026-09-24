@@ -1,4 +1,4 @@
-# デミカメラ（photo-katsudou）
+# デミカメラ
 
 好きな画像をフレームとしてカメラ映像に重ね、そのまま撮影できるブラウザ用カメラアプリ（PWA）。
 ホーム画面に追加して使うことを前提にしています。
@@ -59,7 +59,7 @@ lint・テスト・ビルド（`APP_CHANNEL=prod`）のあと、公開先リポ�
 2. 公開先リポジトリの Settings → Deploy keys に `deploy_key.pub` を「Allow write access」付きで登録する
 3. このリポジトリの Settings → Secrets and variables → Actions で次を設定する
    - Secrets: `PROD_DEPLOY_KEY` に `deploy_key`（秘密鍵）の中身
-   - Variables: `PROD_REPOSITORY` に公開先リポジトリ（例: `someone/photo-katsudou`）
+   - Variables: `PROD_REPOSITORY` に公開先リポジトリ（例: `someone/demi-cam`）
    - Variables: `PROD_BRANCH` に公開先ブランチ（省略時 `gh-pages`）
 4. 手元の鍵ファイルは削除する
 5. 初回の公開後、公開先リポジトリの Settings → Pages で Source を「Deploy from a branch」、
