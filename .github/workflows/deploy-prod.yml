@@ -113,8 +113,9 @@ jobs:
             echo "変更がないため公開をスキップしました"
             exit 0
           fi
+          # 公開先のリポジトリには開発側のリポジトリ名やアカウント名を出さない
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-              commit -q -m "Deploy ${RELEASE_TAG} (${GITHUB_REPOSITORY}@$(git -C .. rev-parse --short HEAD))"
+              commit -q -m "Deploy ${RELEASE_TAG}"
           git push origin "$PROD_BRANCH"
           echo "::notice::${PROD_REPOSITORY} の ${PROD_BRANCH} ブランチに ${RELEASE_TAG} を公開しました"
