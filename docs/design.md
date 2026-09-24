@@ -5,13 +5,15 @@
 
 ## 決定事項
 
-| 項目 | 決定 |
-|---|---|
-| フレーム比率とカメラ映像 | フレームごとに比率を固定し、カメラ映像は **cover で切り抜く**（歪ませない） |
-| 座標系 | フレーム内の位置・サイズは **割合（0〜1）** で保持 |
-| 撮影履歴 | 持たない。保存・共有後は端末の画像ライブラリに任せる |
-| 技術 | フレームワークを使う（下記「技術構成」） |
-| 向き | 縦長フレーム・横長フレームの両方に対応。端末の縦持ち・横持ちの両方に対応 |
+| 項目                     | 決定                                                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| フレーム比率とカメラ映像 | フレームごとに比率を固定し、カメラ映像は **cover で切り抜く**（歪ませない）                                                                      |
+| 座標系                   | フレーム内の位置・サイズは **割合（0〜1）** で保持                                                                                               |
+| 撮影履歴                 | 持たない。保存・共有後は端末の画像ライブラリに任せる                                                                                             |
+| 技術                     | フレームワークを使う（下記「技術構成」）                                                                                                         |
+| 向き                     | 縦長フレーム・横長フレームの両方に対応。端末の縦持ち・横持ちの両方に対応                                                                         |
+| 素材の透過部分           | 透過部分にはそのままカメラ映像が映る。素材の形に特化した処理（外枠の塗りつぶし等）は入れない。不要部分は利用者が端末の写真アプリでトリミングする |
+| 公開                     | GitHub Pages。ただしビルド成果物（`dist/`）は別アカウントのリポジトリに置く。どのパスに置かれても動くよう相対パスでビルドする                    |
 
 ## 画面遷移
 
@@ -36,11 +38,11 @@
 interface Asset {
   id: string;
   name: string;
-  blob: Blob;          // 取り込み時に長辺 4096px 上限へ縮小。PNG/WebP は透過保持
+  blob: Blob; // 取り込み時に長辺 4096px 上限へ縮小。PNG/WebP は透過保持
   mimeType: string;
-  width: number;       // px（縮小後）
+  width: number; // px（縮小後）
   height: number;
-  thumbnail: Blob;     // 一覧表示用
+  thumbnail: Blob; // 一覧表示用
   createdAt: number;
 }
 
@@ -49,7 +51,7 @@ interface Frame {
   id: string;
   name: string;
   aspect: { w: number; h: number }; // 例: {w: 3, h: 4} / 素材由来なら {w: 811, h: 1182}
-  layers: Layer[];                  // 配列の先頭が最背面
+  layers: Layer[]; // 配列の先頭が最背面
   thumbnail: Blob;
   createdAt: number;
   updatedAt: number;
@@ -59,11 +61,11 @@ interface Frame {
 interface Layer {
   id: string;
   assetId: string;
-  cx: number;        // 中心 X（フレーム幅に対する割合）
-  cy: number;        // 中心 Y（フレーム高さに対する割合）
-  width: number;     // 幅（フレーム幅に対する割合）。高さは素材の縦横比から導出
-  rotation: number;  // 度
-  opacity: number;   // 0〜1
+  cx: number; // 中心 X（フレーム幅に対する割合）
+  cy: number; // 中心 Y（フレーム高さに対する割合）
+  width: number; // 幅（フレーム幅に対する割合）。高さは素材の縦横比から導出
+  rotation: number; // 度
+  opacity: number; // 0〜1
   flipX: boolean;
   flipY: boolean;
   visible: boolean;
@@ -113,7 +115,7 @@ coverCrop(videoW, videoH, frameAspect)   -> カメラ映像の切り抜き矩形
 - `enumerateDevices` で全カメラを列挙し選択可能にする。前面/背面の簡易トグルも置く。
 - 前面カメラは画面表示を鏡像にし、保存画像の鏡像/非鏡像は設定で選ぶ。
 - 出力解像度: カメラ映像の切り抜き領域の解像度を基準とし、長辺 4096px を上限とする。
-- シャッター → OffscreenCanvas（なければ canvas）で合成 → Blob → プレビュー。
+- シャッター → canvas で合成（`src/lib/render.ts` の `composePhoto`）→ Blob → プレビュー。
 - 撮影中は Screen Wake Lock で画面消灯を防ぐ。
 
 ## 保存・共有
@@ -136,21 +138,21 @@ coverCrop(videoW, videoH, frameAspect)   -> カメラ映像の切り抜き矩形
 
 ## 技術構成
 
-| 用途 | 採用 |
-|---|---|
-| ビルド | Vite |
-| UI | React + TypeScript |
-| ルーティング | React Router（HashRouter。静的ホスティングでそのまま動く） |
-| 編集キャンバス | react-konva（Transformer で拡大縮小・回転ハンドル） |
-| IndexedDB | Dexie |
-| 状態管理 | Zustand |
-| PWA | vite-plugin-pwa（manifest / Service Worker / 更新通知） |
-| テスト | Vitest（レイアウト計算などの純粋関数） |
-| 品質 | ESLint + Prettier |
-| ホスティング | GitHub Pages（HTTPS 必須のため） |
+| 用途           | 採用                                                                                            |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| ビルド         | Vite                                                                                            |
+| UI             | React + TypeScript                                                                              |
+| ルーティング   | React Router（HashRouter。静的ホスティングでそのまま動く）                                      |
+| 編集キャンバス | react-konva（Transformer で拡大縮小・回転ハンドル）                                             |
+| IndexedDB      | Dexie                                                                                           |
+| 状態管理       | Zustand                                                                                         |
+| PWA            | vite-plugin-pwa（manifest / Service Worker / 更新通知）                                         |
+| テスト         | Vitest（レイアウト計算などの純粋関数）                                                          |
+| 品質           | ESLint + Prettier                                                                               |
+| ホスティング   | GitHub Pages（HTTPS 必須のため）。`vite` の `base: './'` と HashRouter で配置先パスに依存しない |
 
 ## データ保護
 
 - 起動時に `navigator.storage.persist()` を要求する。
 - iOS ではホーム画面版と Safari で IndexedDB が別になる旨をガイドに記載する。
-- フレーム + 素材を 1 ファイル（zip）でエクスポート / インポートできるようにする。
+- （未実装）フレーム + 素材を 1 ファイル（zip）でエクスポート / インポートできるようにする。
