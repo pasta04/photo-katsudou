@@ -1,0 +1,103 @@
+# 一般公開版を別リポジトリの GitHub Pages 用ブランチに push する。
+# v で始まるタグ（例: v1.0.0）を push すると実行される。
+#
+# 事前にこのリポジトリの Settings → Secrets and variables → Actions で設定する:
+#   Variables
+#     PROD_REPOSITORY  公開先リポジトリ（例: someone/photo-katsudou）
+#     PROD_BRANCH      公開先ブランチ（省略時 gh-pages）
+#   Secrets
+#     PROD_DEPLOY_KEY  公開先リポジトリに「Allow write access」付きで登録した Deploy key の秘密鍵
+name: Deploy prod
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+# 公開は順番に 1 つずつ行う（途中で取り消さない）
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROD_REPOSITORY: ${{ vars.PROD_REPOSITORY }}
+      PROD_BRANCH: ${{ vars.PROD_BRANCH || 'gh-pages' }}
+    steps:
+      - name: Check settings
+        env:
+          HAS_DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_KEY != '' }}
+        run: |
+          if [ -z "$PROD_REPOSITORY" ]; then
+            echo "::error::Variables に PROD_REPOSITORY（公開先リポジトリ）を設定してください"
+            exit 1
+          fi
+          if [ "$HAS_DEPLOY_KEY" != "true" ]; then
+            echo "::error::Secrets に PROD_DEPLOY_KEY（公開先リポジトリの Deploy key の秘密鍵）を設定してください"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+
+      # アプリに表示されるバージョンとタグを一致させる
+      - name: Check tag matches package.json version
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$version" ]; then
+            echo "::error::タグ $GITHUB_REF_NAME と package.json のバージョン $version が一致しません"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env:
+          APP_CHANNEL: prod
+
+      - name: Publish to ${{ env.PROD_REPOSITORY }} (${{ env.PROD_BRANCH }})
+        env:
+          DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes"
+
+          git clone --depth 1 --no-checkout "git@github.com:${PROD_REPOSITORY}.git" publish
+          cd publish
+          if git ls-remote --exit-code --heads origin "$PROD_BRANCH" >/dev/null; then
+            git fetch --depth 1 origin "$PROD_BRANCH"
+            git checkout -B "$PROD_BRANCH" FETCH_HEAD
+          else
+            git checkout --orphan "$PROD_BRANCH"
+          fi
+
+          # 独自ドメインの設定（CNAME）は残し、それ以外はビルド結果で置き換える
+          [ -f CNAME ] && cp CNAME ../CNAME.keep
+          git rm -rq --ignore-unmatch .
+          git clean -fdq
+          cp -R ../dist/. .
+          [ -f ../CNAME.keep ] && cp ../CNAME.keep CNAME
+          # GitHub Pages の Jekyll 処理を止める
+          touch .nojekyll
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "変更がないため公開をスキップしました"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "Deploy ${GITHUB_REF_NAME} (${GITHUB_REPOSITORY}@${GITHUB_SHA::7})"
+          git push origin "$PROD_BRANCH"
+          echo "::notice::${PROD_REPOSITORY} の ${PROD_BRANCH} ブランチに ${GITHUB_REF_NAME} を公開しました"
