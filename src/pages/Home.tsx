@@ -6,12 +6,7 @@ import { IS_DEV_CHANNEL } from '../lib/appInfo';
 export function Home() {
   return (
     <main className="page home">
-      <header className="home-header">
-        <img src="./favicon.svg" alt="" className="home-logo" />
-        <h1>フォトカツドウ</h1>
-        {IS_DEV_CHANNEL && <span className="dev-badge">開発版</span>}
-        <p className="muted">好きなフレームを重ねて撮影できるカメラ</p>
-      </header>
+      {IS_DEV_CHANNEL && <span className="dev-badge">開発版</span>}
 
       <InstallBanner />
 
@@ -49,10 +44,6 @@ export function Home() {
           設定
         </Link>
       </nav>
-
-      <p className="muted small center">
-        画像や写真はすべてこの端末の中だけに保存され、外部には送信されません。
-      </p>
     </main>
   );
 }

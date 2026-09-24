@@ -6,6 +6,7 @@ class AppDB extends Dexie {
   frames!: Table<Frame, string>;
 
   constructor() {
+    // 保存済みデータを引き継ぐため、アプリ名を変えてもデータベース名は変えない
     super('photo-katsudou');
     this.version(1).stores({
       assets: 'id, createdAt',

@@ -242,5 +242,5 @@ function photoFileName(frame: Frame | null, ext: string): string {
   const p = (n: number) => String(n).padStart(2, '0');
   const stamp = `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
   const name = frame ? `_${frame.name.replace(/[\\/:*?"<>|\s]+/g, '_')}` : '';
-  return `photo-katsudou${name}_${stamp}.${ext}`;
+  return `demi-camera${name}_${stamp}.${ext}`;
 }

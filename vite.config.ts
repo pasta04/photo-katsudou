@@ -11,8 +11,8 @@ import pkg from './package.json' with { type: 'json' };
  */
 const channel = process.env.APP_CHANNEL === 'prod' ? 'prod' : 'dev';
 const isDev = channel === 'dev';
-const appName = isDev ? 'フォトカツドウ 開発版' : 'フォトカツドウ';
-const shortName = isDev ? 'フォトカツ開発' : 'フォトカツ';
+const appName = isDev ? 'デミカメラ 開発版' : 'デミカメラ';
+const shortName = isDev ? 'デミカメラ開発' : 'デミカメラ';
 const commit = (process.env.GITHUB_SHA ?? '').slice(0, 7);
 
 // 配置先のパスに依存しないよう相対パスでビルドする
@@ -34,7 +34,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        // 開発版と公開版が同じ端末に入っても別アプリとして扱われるようにする
+        // 開発版と公開版が同じ端末に入っても別アプリとして扱われるようにする。
+        // インストール済みのアプリを引き継ぐため、アプリ名を変えてもこの値は変えない
         id: `photo-katsudou-${channel}`,
         name: appName,
         short_name: shortName,
