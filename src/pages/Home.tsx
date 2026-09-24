@@ -1,6 +1,7 @@
 import { Camera, CircleHelp, Frame, Images, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { InstallBanner } from '../components/InstallBanner';
+import { IS_DEV_CHANNEL } from '../lib/appInfo';
 
 export function Home() {
   return (
@@ -8,6 +9,7 @@ export function Home() {
       <header className="home-header">
         <img src="./favicon.svg" alt="" className="home-logo" />
         <h1>フォトカツドウ</h1>
+        {IS_DEV_CHANNEL && <span className="dev-badge">開発版</span>}
         <p className="muted">好きなフレームを重ねて撮影できるカメラ</p>
       </header>
 

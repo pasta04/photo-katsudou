@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TopBar } from '../components/TopBar';
 import { db } from '../db/db';
+import { versionLabel } from '../lib/appInfo';
 import { useSettings } from '../store/settings';
 
 export function SettingsPage() {
@@ -79,7 +80,7 @@ export function SettingsPage() {
         </section>
 
         <section>
-          <p className="muted small">バージョン {__APP_VERSION__}</p>
+          <p className="muted small">バージョン {versionLabel()}</p>
         </section>
       </main>
     </div>

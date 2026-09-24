@@ -30,8 +30,28 @@ HTTPS で公開する手段（トンネリングサービス等）を使って�
 
 ## 公開
 
-`npm run build` で出力される `dist/` の中身を、公開用リポジトリの GitHub Pages に置きます。
+ビルド時の環境変数 `APP_CHANNEL` で配信チャンネルを切り替えます。
+
+| チャンネル    | 用途               | 公開先                                  | アプリ名              |
+| ------------- | ------------------ | --------------------------------------- | --------------------- |
+| `dev`（既定） | 動作確認用の開発版 | このリポジトリの GitHub Pages           | フォトカツドウ 開発版 |
+| `prod`        | 一般公開版         | 別リポジトリの GitHub Pages（整備予定） | フォトカツドウ        |
+
+開発版と公開版はアプリ名と manifest の `id` が異なるため、同じ端末のホーム画面に両方追加しても区別できます。
 相対パス（`base: './'`）と HashRouter でビルドしているため、どのパスに置いても動きます。
+
+### 開発版のデプロイ
+
+`main` に push すると `.github/workflows/deploy-dev.yml` が動き、テストとビルドのあと GitHub Pages にデプロイします。
+Actions 画面の「Deploy dev」から手動でも実行できます。
+
+初回のみ、リポジトリの Settings → Pages → Build and deployment → Source を「GitHub Actions」にしてください。
+
+### 一般公開版のビルド
+
+```sh
+APP_CHANNEL=prod npm run build
+```
 
 ## ディレクトリ構成
 

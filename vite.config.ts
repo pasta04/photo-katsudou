@@ -3,20 +3,41 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import pkg from './package.json' with { type: 'json' };
 
-// ビルド成果物は別リポジトリの GitHub Pages に置くため、配置パスに依存しない相対パスでビルドする
+/**
+ * 配信チャンネル。ビルド時に環境変数 APP_CHANNEL で指定する。
+ * - dev: 動作確認用の開発版（このリポジトリの GitHub Pages）。既定値
+ * - prod: 一般公開版（別リポジトリの GitHub Pages）
+ * ホーム画面に両方追加しても見分けられるよう、アプリ名を変える。
+ */
+const channel = process.env.APP_CHANNEL === 'prod' ? 'prod' : 'dev';
+const isDev = channel === 'dev';
+const appName = isDev ? 'フォトカツドウ 開発版' : 'フォトカツドウ';
+const shortName = isDev ? 'フォトカツ開発' : 'フォトカツ';
+const commit = (process.env.GITHUB_SHA ?? '').slice(0, 7);
+
+// 配置先のパスに依存しないよう相対パスでビルドする
 export default defineConfig({
   base: './',
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
+    __APP_CHANNEL__: JSON.stringify(channel),
+    __APP_COMMIT__: JSON.stringify(commit),
   },
   plugins: [
     react(),
+    {
+      name: 'app-name-in-html',
+      transformIndexHtml: (html) =>
+        html.replaceAll('%APP_NAME%', appName).replaceAll('%APP_SHORT_NAME%', shortName),
+    },
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'フォトカツドウ',
-        short_name: 'フォトカツ',
+        // 開発版と公開版が同じ端末に入っても別アプリとして扱われるようにする
+        id: `photo-katsudou-${channel}`,
+        name: appName,
+        short_name: shortName,
         description: '好きなフレームを重ねて撮影できるカメラアプリ',
         lang: 'ja',
         start_url: './',
