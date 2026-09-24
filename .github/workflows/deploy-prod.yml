@@ -1,5 +1,6 @@
 # 一般公開版を別リポジトリの GitHub Pages 用ブランチに push する。
-# v で始まるタグ（例: v1.0.0）を push したとき、または Release ワークフローから呼ばれたときに実行される。
+# v で始まるタグ（例: v1.0.0）を push したとき、Release ワークフローから呼ばれたとき、
+# または Actions 画面から公開するタグを指定して手動実行したときに実行される。
 #
 # 事前にこのリポジトリの Settings → Secrets and variables → Actions で設定する:
 #   Variables
@@ -14,6 +15,13 @@ on:
     tags: ['v*']
   # Release ワークフローから呼ぶ（GITHUB_TOKEN で push したタグでは push イベントが起きないため）
   workflow_call:
+    inputs:
+      tag:
+        description: '公開するタグ（例: v1.0.0）'
+        required: true
+        type: string
+  # 公開だけやり直したいとき用
+  workflow_dispatch:
     inputs:
       tag:
         description: '公開するタグ（例: v1.0.0）'

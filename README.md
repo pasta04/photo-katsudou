@@ -75,6 +75,9 @@ lint・テスト・ビルド（`APP_CHANNEL=prod`）のあと、公開先リポ�
 `.github/workflows/release.yml` が lint とテストのあと `npm version` でバージョンを上げ、
 コミットとタグ（例: `v0.1.1`）を `main` に push し、続けて一般公開版をデプロイします。
 
+バージョンは上がったが公開だけ失敗した場合は、Actions → 「Deploy prod」→「Run workflow」で
+公開するタグ（例: `v0.1.1`）を指定すると、公開だけやり直せます。
+
 手元から行う場合は次のとおりです（タグは `package.json` の `version` と一致している必要があります）。
 
 ```sh

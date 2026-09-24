@@ -32,7 +32,10 @@ jobs:
     outputs:
       tag: ${{ steps.bump.outputs.tag }}
     steps:
+      # 「Re-run」でも実行時点の最新の main から始める（古いコミットから再度バージョンを上げないように）
       - uses: actions/checkout@v5
+        with:
+          ref: main
       - uses: actions/setup-node@v5
         with:
           node-version: 22
@@ -50,7 +53,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           tag="$(npm version "$BUMP" -m "Release v%s")"
-          git push origin HEAD:main "$tag"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+            echo "::error::タグ $tag はすでに存在します。不要なタグなら削除してから、もう一度実行してください"
+            exit 1
+          fi
+          # main とタグは両方 push できたときだけ反映する（片方だけ反映されないように）
+          git push --atomic origin HEAD:main "$tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "::notice::$tag を作成しました"
 
