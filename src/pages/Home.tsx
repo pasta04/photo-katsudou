@@ -8,7 +8,7 @@ export function Home() {
     <main className="page home">
       <header className="home-header">
         <img src="./favicon.svg" alt="" className="home-logo" />
-        <h1>フォトカツドウ</h1>
+        <h1>デミカメラ</h1>
         {IS_DEV_CHANNEL && <span className="dev-badge">開発版</span>}
         <p className="muted">好きなフレームを重ねて撮影できるカメラ</p>
       </header>

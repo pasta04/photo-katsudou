@@ -1,4 +1,4 @@
-# photo-katsudou 設計メモ
+# デミカメラ（photo-katsudou）設計メモ
 
 ブラウザ（PWA）で動くフレームカメラアプリ。ユーザーが登録した画像素材を
 カメラ映像に重ねて撮影する。
@@ -124,7 +124,7 @@ coverCrop(videoW, videoH, frameAspect)   -> カメラ映像の切り抜き矩形
   （iOS ではここから「画像を保存」でカメラロールに入る）。
 - 共有できない環境では `<a download>` でダウンロードする。
 - 形式は JPEG（品質 0.92 既定）/ PNG を設定で選ぶ。ファイル名は
-  `photo-katsudou_<フレーム名>_<yyyyMMdd-HHmmss>.jpg`。
+  `demi-camera_<フレーム名>_<yyyyMMdd-HHmmss>.jpg`。
 
 ## フレーム編集
 
