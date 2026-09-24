@@ -13,7 +13,8 @@ const channel = process.env.APP_CHANNEL === 'prod' ? 'prod' : 'dev';
 const isDev = channel === 'dev';
 const appName = isDev ? 'デミカメラ 開発版' : 'デミカメラ';
 const shortName = isDev ? 'デミカメラ開発' : 'デミカメラ';
-const commit = (process.env.GITHUB_SHA ?? '').slice(0, 7);
+// APP_COMMIT はビルドしたコミットを明示するとき（リリース時など）に使う
+const commit = (process.env.APP_COMMIT ?? process.env.GITHUB_SHA ?? '').slice(0, 7);
 
 // 配置先のパスに依存しないよう相対パスでビルドする
 export default defineConfig({

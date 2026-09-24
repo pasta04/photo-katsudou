@@ -1,0 +1,62 @@
+# 一般公開版のリリース。Actions 画面の「Release」→「Run workflow」から実行する。
+# npm version でバージョンを上げてコミットとタグを main に push し、続けて一般公開版をデプロイする。
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'バージョンの上げ方（patch: 修正 / minor: 機能追加 / major: 大きな変更）'
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    # main 以外のブランチからは実行しない
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.bump.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # 壊れた状態でバージョンだけ上がらないよう、先に確認する
+      - run: npm run lint
+      - run: npm test
+
+      - name: Bump version
+        id: bump
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tag="$(npm version "$BUMP" -m "Release v%s")"
+          git push origin HEAD:main "$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "::notice::$tag を作成しました"
+
+  deploy:
+    needs: version
+    uses: ./.github/workflows/deploy-prod.yml
+    with:
+      tag: ${{ needs.version.outputs.tag }}
+    secrets: inherit

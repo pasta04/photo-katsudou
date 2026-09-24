@@ -49,7 +49,7 @@ Actions 画面の「Deploy dev」から手動でも実行できます。
 
 ### 一般公開版のデプロイ
 
-`v` で始まるタグ（例: `v1.0.0`）を push すると `.github/workflows/deploy-prod.yml` が動き、
+`v` で始まるタグ（例: `v1.0.0`）を push するか、下記の Release ワークフローを実行すると `.github/workflows/deploy-prod.yml` が動き、
 lint・テスト・ビルド（`APP_CHANNEL=prod`）のあと、公開先リポジトリのブランチにビルド結果を push します。
 公開先ブランチの中身はビルド結果で置き換えます（独自ドメイン用の `CNAME` だけは残します）。
 
@@ -67,10 +67,18 @@ lint・テスト・ビルド（`APP_CHANNEL=prod`）のあと、公開先リポ�
 
 #### リリース手順
 
-タグは `package.json` の `version` と一致している必要があります（アプリの設定画面に表示されるバージョンと揃えるため）。
+ブラウザから実行できます。
+
+1. このリポジトリの Actions → 「Release」→「Run workflow」を開く
+2. ブランチは `main` のまま、バージョンの上げ方（`patch` / `minor` / `major`）を選んで実行する
+
+`.github/workflows/release.yml` が lint とテストのあと `npm version` でバージョンを上げ、
+コミットとタグ（例: `v0.1.1`）を `main` に push し、続けて一般公開版をデプロイします。
+
+手元から行う場合は次のとおりです（タグは `package.json` の `version` と一致している必要があります）。
 
 ```sh
-npm version patch   # package.json を更新し、コミットとタグ（例: v0.1.1）を作る。minor / major も可
+npm version patch   # package.json を更新し、コミットとタグを作る。minor / major も可
 git push --follow-tags
 ```
 

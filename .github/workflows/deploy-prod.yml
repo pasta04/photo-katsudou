@@ -1,5 +1,5 @@
 # 一般公開版を別リポジトリの GitHub Pages 用ブランチに push する。
-# v で始まるタグ（例: v1.0.0）を push すると実行される。
+# v で始まるタグ（例: v1.0.0）を push したとき、または Release ワークフローから呼ばれたときに実行される。
 #
 # 事前にこのリポジトリの Settings → Secrets and variables → Actions で設定する:
 #   Variables
@@ -12,19 +12,26 @@ name: Deploy prod
 on:
   push:
     tags: ['v*']
+  # Release ワークフローから呼ぶ（GITHUB_TOKEN で push したタグでは push イベントが起きないため）
+  workflow_call:
+    inputs:
+      tag:
+        description: '公開するタグ（例: v1.0.0）'
+        required: true
+        type: string
 
 permissions:
   contents: read
 
-# 公開は順番に 1 つずつ行う（途中で取り消さない）
-concurrency:
-  group: deploy-prod
-  cancel-in-progress: false
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # 公開は順番に 1 つずつ行う（途中で取り消さない）
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
     env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
       PROD_REPOSITORY: ${{ vars.PROD_REPOSITORY }}
       PROD_BRANCH: ${{ vars.PROD_BRANCH || 'gh-pages' }}
     steps:
@@ -42,13 +49,15 @@ jobs:
           fi
 
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       # アプリに表示されるバージョンとタグを一致させる
       - name: Check tag matches package.json version
         run: |
           version="v$(node -p "require('./package.json').version")"
-          if [ "$GITHUB_REF_NAME" != "$version" ]; then
-            echo "::error::タグ $GITHUB_REF_NAME と package.json のバージョン $version が一致しません"
+          if [ "$RELEASE_TAG" != "$version" ]; then
+            echo "::error::タグ $RELEASE_TAG と package.json のバージョン $version が一致しません"
             exit 1
           fi
 
@@ -59,7 +68,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
-      - run: npm run build
+      - run: APP_COMMIT="$(git rev-parse HEAD)" npm run build
         env:
           APP_CHANNEL: prod
 
@@ -98,6 +107,6 @@ jobs:
           fi
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-              commit -q -m "Deploy ${GITHUB_REF_NAME} (${GITHUB_REPOSITORY}@${GITHUB_SHA::7})"
+              commit -q -m "Deploy ${RELEASE_TAG} (${GITHUB_REPOSITORY}@$(git -C .. rev-parse --short HEAD))"
           git push origin "$PROD_BRANCH"
-          echo "::notice::${PROD_REPOSITORY} の ${PROD_BRANCH} ブランチに ${GITHUB_REF_NAME} を公開しました"
+          echo "::notice::${PROD_REPOSITORY} の ${PROD_BRANCH} ブランチに ${RELEASE_TAG} を公開しました"
