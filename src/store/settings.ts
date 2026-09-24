@@ -30,6 +30,6 @@ export const useSettings = create<SettingsState>()(
       lastDeviceId: null,
       set: (patch) => set(patch),
     }),
-    { name: 'photo-katsudou-settings' },
+    { name: 'demi-camera-settings' },
   ),
 );

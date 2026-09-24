@@ -4,7 +4,7 @@
 #
 # 事前にこのリポジトリの Settings → Secrets and variables → Actions で設定する:
 #   Variables
-#     PROD_REPOSITORY  公開先リポジトリ（例: someone/photo-katsudou）
+#     PROD_REPOSITORY  公開先リポジトリ（例: someone/demi-cam）
 #     PROD_BRANCH      公開先ブランチ（省略時 gh-pages）
 #   Secrets
 #     PROD_DEPLOY_KEY  公開先リポジトリに「Allow write access」付きで登録した Deploy key の秘密鍵
