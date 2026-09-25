@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BackupSection } from '../components/BackupSection';
 import { TopBar } from '../components/TopBar';
 import { db } from '../db/db';
 import { versionLabel } from '../lib/appInfo';
@@ -59,6 +60,8 @@ export function SettingsPage() {
             </span>
           </label>
         </section>
+
+        <BackupSection />
 
         <section>
           <h2>データ</h2>
