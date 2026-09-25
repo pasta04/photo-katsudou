@@ -20,7 +20,7 @@ export function Frames() {
   return (
     <div className="page-with-bar">
       <TopBar title="フレーム">
-        <Link to="/assets" className="icon-button" aria-label="素材">
+        <Link to="/assets" className="icon-button" aria-label="素材" title="素材">
           <Images />
         </Link>
       </TopBar>
