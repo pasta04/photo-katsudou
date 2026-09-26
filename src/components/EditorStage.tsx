@@ -16,7 +16,6 @@ const SNAP = 8;
 interface Props {
   frame: Frame;
   images: ReadonlyMap<string, HTMLImageElement>;
-  editable: boolean;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   /** coalesce を渡すと、同じキーの連続変更は Undo 1 回分にまとめられる */
@@ -25,7 +24,7 @@ interface Props {
 }
 
 export function EditorStage(props: Props) {
-  const { frame, images, editable, selectedId, onSelect, onChangeLayer, showCamera } = props;
+  const { frame, images, selectedId, onSelect, onChangeLayer, showCamera } = props;
   const [containerRef, size] = useElementSize<HTMLDivElement>();
   const accent = getTheme(useSettings((s) => s.theme)).colors.accent;
   const rect: Rect = useMemo(() => {
@@ -42,7 +41,7 @@ export function EditorStage(props: Props) {
   const [guides, setGuides] = useState({ x: false, y: false });
 
   const selected = frame.layers.find((l) => l.id === selectedId);
-  const selectable = editable && selected && !selected.locked && selected.visible;
+  const selectable = selected && !selected.locked && selected.visible;
 
   useEffect(() => {
     const tr = transformerRef.current;
@@ -117,7 +116,7 @@ export function EditorStage(props: Props) {
                   rect.width,
                   rect.height,
                 );
-                const interactive = editable && !layer.locked;
+                const interactive = !layer.locked;
                 return (
                   <KImage
                     key={layer.id}

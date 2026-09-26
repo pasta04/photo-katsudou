@@ -68,9 +68,7 @@ export function NewFrameDialog({ onClose, onCreated }: Props) {
           onChange={(e) => setName(e.target.value)}
         />
       </label>
-      <p>
-        作成するフレームの比率を選択してね。
-      </p>
+      <p>作成するフレームの比率を選択してね。</p>
 
       <div className="segmented">
         <button className={source === 'asset' ? 'selected' : ''} onClick={() => setSource('asset')}>
@@ -86,9 +84,7 @@ export function NewFrameDialog({ onClose, onCreated }: Props) {
 
       {source === 'asset' ? (
         <div className="stack">
-          <p className="muted">
-            完成済みのフレーム画像を使うときはこちら。
-          </p>
+          <p className="muted">完成済みのフレーム画像を使うときはこちら。</p>
           <button className="asset-choice" onClick={() => setPicking(true)}>
             {asset ? (
               <>
