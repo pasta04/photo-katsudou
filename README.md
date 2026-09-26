@@ -28,6 +28,15 @@ npm run preview  # ビルド結果の確認
 カメラは HTTPS か `localhost` でしか使えません。スマートフォン実機で開発サーバーを確認する場合は
 HTTPS で公開する手段（トンネリングサービス等）を使ってください。
 
+### Dev Container
+
+`.devcontainer/devcontainer.json` を用意しています。VS Code の Dev Containers 拡張や GitHub Codespaces で開くと、
+Node.js 22 の環境で `npm ci` まで自動で実行されます。
+
+- `node_modules` はコンテナ内のボリュームに置くため、ホスト側の `node_modules` とは別になります
+- 5173（`npm run dev`）と 4173（`npm run preview`）がホストの `localhost` に転送されるので、ホストのブラウザでカメラも使えます
+- ESLint・Prettier・Vitest の拡張が入り、保存時に Prettier で整形されます
+
 ## 公開
 
 ビルド時の環境変数 `APP_CHANNEL` で配信チャンネルを切り替えます。
