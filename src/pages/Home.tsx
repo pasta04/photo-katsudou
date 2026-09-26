@@ -15,7 +15,7 @@ export function Home() {
           <Camera />
           <div>
             <strong>カメラ撮影</strong>
-            <p>フレームを使って素敵な写真を撮ってね</p>
+            <p>作成したフレームで素敵な写真を撮ってね</p>
           </div>
         </Link>
         <Link to="/frames" className="home-card">

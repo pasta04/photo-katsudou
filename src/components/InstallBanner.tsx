@@ -1,4 +1,4 @@
-import { Smartphone } from 'lucide-react';
+import { CircleHelp, Smartphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isStandalone } from '../lib/platform';
 import { useInstall } from '../store/install';
@@ -22,6 +22,7 @@ export function InstallBanner() {
             </button>
           )}
           <Link className="button" to="/guide">
+            <CircleHelp />
             追加のしかた
           </Link>
         </div>
