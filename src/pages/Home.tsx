@@ -14,22 +14,22 @@ export function Home() {
         <Link to="/camera" className="home-card primary">
           <Camera />
           <div>
-            <strong>カメラで撮影</strong>
-            <p>作ったフレームを選んで撮影します。撮った写真は保存・共有できます。</p>
+            <strong>カメラ撮影</strong>
+            <p>フレームを使って素敵な写真を撮ってね</p>
           </div>
         </Link>
         <Link to="/frames" className="home-card">
           <Frame />
           <div>
-            <strong>フレームを編集</strong>
-            <p>素材を並べてフレームを作ります。位置・大きさ・重なり順を自由に調整できます。</p>
+            <strong>フレーム編集</strong>
+            <p>登録した素材で写真のフレームを作れます</p>
           </div>
         </Link>
         <Link to="/assets" className="home-card">
           <Images />
           <div>
-            <strong>素材を管理</strong>
-            <p>フレームに使う画像を登録します。透過 PNG は透けた部分にカメラ映像が映ります。</p>
+            <strong>素材管理</strong>
+            <p>フレームに使う画像の登録・削除はここから</p>
           </div>
         </Link>
       </nav>
