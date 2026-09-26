@@ -11,6 +11,7 @@ import { useAssetImages } from '../hooks/useAssetImages';
 import { CAMERA_ERROR_MESSAGES, useCamera } from '../hooks/useCamera';
 import { useElementSize } from '../hooks/useElementSize';
 import { useWakeLock } from '../hooks/useWakeLock';
+import { fileTimestamp } from '../lib/fileName';
 import { containRect, isPortrait } from '../lib/layout';
 import { canvasToBlob, composePhoto } from '../lib/render';
 import { useSettings } from '../store/settings';
@@ -238,9 +239,6 @@ export function CameraPage() {
 }
 
 function photoFileName(frame: Frame | null, ext: string): string {
-  const d = new Date();
-  const p = (n: number) => String(n).padStart(2, '0');
-  const stamp = `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
   const name = frame ? `_${frame.name.replace(/[\\/:*?"<>|\s]+/g, '_')}` : '';
-  return `demi-camera${name}_${stamp}.${ext}`;
+  return `demi-camera${name}_${fileTimestamp()}.${ext}`;
 }

@@ -29,6 +29,16 @@ function resized(bitmap: ImageBitmap, maxSize: number): HTMLCanvasElement {
   return canvas;
 }
 
+/** 素材一覧に表示するサムネイルを作る */
+export async function makeAssetThumbnail(blob: Blob): Promise<Blob> {
+  const bitmap = await decode(blob);
+  try {
+    return await canvasToBlob(resized(bitmap, THUMBNAIL_SIZE), 'image/png');
+  } finally {
+    bitmap.close();
+  }
+}
+
 /** 画像ファイルを素材として登録する。大きすぎる画像は縮小し、透過は保持する */
 export async function importAsset(file: File): Promise<Asset> {
   const bitmap = await decode(file);
