@@ -13,8 +13,8 @@ export function InstallBanner() {
     <section className="install-banner">
       <Smartphone className="install-icon" />
       <div>
-        <strong>ホーム画面に追加して使ってください</strong>
-        <p>アプリとして全画面で使えるようになって便利です</p>
+        <strong>ホーム画面に追加してね</strong>
+        <p>アプリみたいに使えて便利です</p>
         <div className="row">
           {promptEvent && (
             <button className="button primary" onClick={install}>
