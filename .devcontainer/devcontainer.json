@@ -1,0 +1,27 @@
+{
+  "name": "demi-camera",
+  // CI（.github/workflows）と同じ Node.js 22
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  // node_modules はボリュームに置き、ホスト側（macOS / Windows）のものと混ざらないようにする
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+  "postCreateCommand": "sudo chown node:node node_modules && npm ci",
+  // 5173: npm run dev / 4173: npm run preview
+  // localhost に転送されるので、ホストのブラウザでカメラ（HTTPS か localhost が必要）が使える
+  "forwardPorts": [5173, 4173],
+  "portsAttributes": {
+    "5173": { "label": "dev", "onAutoForward": "openBrowser" },
+    "4173": { "label": "preview", "onAutoForward": "notify" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "vitest.explorer"],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "typescript.tsdk": "node_modules/typescript/lib"
+      }
+    }
+  }
+}
