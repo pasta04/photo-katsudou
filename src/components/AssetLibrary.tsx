@@ -20,11 +20,7 @@ export function AssetLibrary({ onPick }: Props) {
   return (
     <div className="asset-library">
       <AssetUploadButton onImported={(list) => list.length === 1 && onPick?.(list[0])} />
-      {assets?.length === 0 && (
-        <p className="empty">
-          まだ素材がありません。
-        </p>
-      )}
+      {assets?.length === 0 && <p className="empty">まだ素材がありません。</p>}
       <ul className="asset-grid">
         {assets?.map((asset) => (
           <li key={asset.id}>

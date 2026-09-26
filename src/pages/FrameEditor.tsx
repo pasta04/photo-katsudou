@@ -1,5 +1,5 @@
-import { Lock, LockOpen, Redo2, Settings2, Undo2, Video, VideoOff } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Redo2, Save, Settings2, Undo2, Video, VideoOff } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AspectPicker } from '../components/AspectPicker';
 import { AssetLibrary } from '../components/AssetLibrary';
@@ -13,8 +13,6 @@ import { useAssetImages } from '../hooks/useAssetImages';
 import { useHistory } from '../hooks/useHistory';
 import { fitWidth, sameAspect } from '../lib/layout';
 import type { Asset, Frame, Layer } from '../types';
-
-const AUTOSAVE_DELAY = 500;
 
 export function FrameEditor() {
   const { id } = useParams<{ id: string }>();
@@ -46,13 +44,29 @@ function Editor({ initial }: { initial: Frame }) {
   const history = useHistory<Frame>(initial);
   const frame = history.present;
   const images = useAssetImages(frame.layers);
+  const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [editable, setEditable] = useState(true);
   const [showCamera, setShowCamera] = useState(false);
   const [adding, setAdding] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [saving, setSaving] = useState(false);
+  /** 最後に保存した状態。present と違えば未保存の変更がある */
+  const [savedFrame, setSavedFrame] = useState(initial);
+  const dirty = frame !== savedFrame;
 
-  useAutosave(frame, initial);
+  useUnloadWarning(dirty);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await saveFrame(frame);
+      setSavedFrame(frame);
+    } finally {
+      setSaving(false);
+    }
+  };
+  const goBack = () => navigate('/frames');
 
   const update = useCallback(
     (patch: Partial<Frame>, coalesce?: string) => history.set({ ...frame, ...patch }, coalesce),
@@ -73,7 +87,6 @@ function Editor({ initial }: { initial: Frame }) {
       : newLayer(asset, frame.aspect);
     setLayers([...frame.layers, layer]);
     setSelectedId(layer.id);
-    setEditable(true);
     setAdding(false);
   };
 
@@ -105,7 +118,7 @@ function Editor({ initial }: { initial: Frame }) {
 
   return (
     <div className="page-with-bar editor">
-      <TopBar title={frame.name} back="/frames">
+      <TopBar title={frame.name} onBack={() => (dirty ? setLeaving(true) : goBack())}>
         <button
           className="icon-button"
           onClick={history.undo}
@@ -137,6 +150,15 @@ function Editor({ initial }: { initial: Frame }) {
         >
           <Settings2 />
         </button>
+        <button
+          className={`icon-button save-button${dirty ? ' dirty' : ''}`}
+          onClick={save}
+          disabled={!dirty || saving}
+          aria-label="保存"
+          title={dirty ? '保存' : '保存済み'}
+        >
+          <Save />
+        </button>
       </TopBar>
 
       <div className="editor-body">
@@ -144,26 +166,15 @@ function Editor({ initial }: { initial: Frame }) {
           <EditorStage
             frame={frame}
             images={images}
-            editable={editable}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onChangeLayer={changeLayer}
             showCamera={showCamera}
           />
-          <div className="editor-mode-bar">
-            <button
-              className={`mode-toggle${editable ? ' editing' : ''}`}
-              onClick={() => setEditable((v) => !v)}
-            >
-              {editable ? <LockOpen /> : <Lock />}
-              {editable ? '編集中' : '配置を固定中'}
-            </button>
-          </div>
         </div>
         <LayerPanel
           layers={frame.layers}
           selectedId={selectedId}
-          editable={editable}
           onSelect={(id) => setSelectedId(id)}
           onChange={changeLayer}
           onMove={moveLayer}
@@ -182,6 +193,25 @@ function Editor({ initial }: { initial: Frame }) {
           <AssetLibrary onPick={addAsset} />
         </Dialog>
       )}
+      {leaving && (
+        <Dialog
+          title="保存していない変更があります"
+          onClose={() => setLeaving(false)}
+          actions={
+            <>
+              <button className="button" onClick={() => setLeaving(false)}>
+                戻らない
+              </button>
+              <button className="button danger" onClick={goBack}>
+                戻る
+              </button>
+            </>
+          }
+        >
+          <p>保存していない変更内容がありますが、フレーム一覧に戻ってよいですか？</p>
+          <p className="muted small">戻ると、保存していない変更は失われます。</p>
+        </Dialog>
+      )}
       {settingsOpen && (
         <FrameSettingsDialog
           frame={frame}
@@ -196,35 +226,14 @@ function Editor({ initial }: { initial: Frame }) {
   );
 }
 
-/** 変更をしばらく待ってから保存する。画面を離れるときは即保存する */
-function useAutosave(frame: Frame, initial: Frame) {
-  const latest = useRef(frame);
-  const saved = useRef(initial);
-
+/** 未保存の変更があるときは、タブを閉じる・再読み込みの前にブラウザの確認を出す */
+function useUnloadWarning(dirty: boolean) {
   useEffect(() => {
-    latest.current = frame;
-    if (frame === saved.current) return;
-    const timer = setTimeout(() => {
-      saved.current = frame;
-      saveFrame(frame);
-    }, AUTOSAVE_DELAY);
-    return () => clearTimeout(timer);
-  }, [frame]);
-
-  useEffect(() => {
-    const flush = () => {
-      if (latest.current === saved.current) return;
-      saved.current = latest.current;
-      saveFrame(latest.current);
-    };
-    // ホーム画面アプリはタスク切り替えでそのまま終了されることがある
-    const onHide = () => document.visibilityState === 'hidden' && flush();
-    document.addEventListener('visibilitychange', onHide);
-    return () => {
-      document.removeEventListener('visibilitychange', onHide);
-      flush();
-    };
-  }, []);
+    if (!dirty) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [dirty]);
 }
 
 function FrameSettingsDialog({
@@ -264,9 +273,7 @@ function FrameSettingsDialog({
       <div className="stack">
         <span className="field-label">比率</span>
         <AspectPicker value={aspect} onChange={setAspect} />
-        <p className="muted small">
-          比率を変えると、比率に合わせて素材が移動します。
-        </p>
+        <p className="muted small">比率を変えると、比率に合わせて素材が移動します。</p>
       </div>
     </Dialog>
   );
