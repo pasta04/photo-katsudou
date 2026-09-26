@@ -251,6 +251,12 @@ button {
   gap: 10px;
   font-size: 0.9rem;
 }
+.slider input:disabled {
+  opacity: 0.4;
+}
+.locked-note {
+  margin: 0;
+}
 .slider input {
   flex: 1;
   padding: 0;
