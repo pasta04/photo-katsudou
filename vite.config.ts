@@ -16,9 +16,15 @@ const shortName = isDev ? 'デミカメラ開発' : 'デミカメラ';
 // APP_COMMIT はビルドしたコミットを明示するとき（リリース時など）に使う
 const commit = (process.env.APP_COMMIT ?? process.env.GITHUB_SHA ?? '').slice(0, 7);
 
+// Dev Container では 0.0.0.0 で待ち受けないとホストのブラウザから届かない（devcontainer.json で指定）。
+// それ以外では従来どおり localhost のみ
+const host = process.env.DEV_SERVER_HOST || undefined;
+
 // 配置先のパスに依存しないよう相対パスでビルドする
 export default defineConfig({
   base: './',
+  server: { host },
+  preview: { host },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __APP_CHANNEL__: JSON.stringify(channel),
