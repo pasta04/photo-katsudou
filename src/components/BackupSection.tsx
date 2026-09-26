@@ -95,7 +95,7 @@ export function BackupSection() {
 
       {pending && (
         <Dialog
-          title="バックアップを読み込む"
+          title="バックアップファイルを読み込む"
           onClose={() => !busy && setPending(null)}
           actions={
             <>
@@ -119,10 +119,7 @@ export function BackupSection() {
               </>
             )}
           </p>
-          <p>元のデータは削除されます。よろしいですか？</p>
-          <p className="muted small">
-            今の素材・フレームはすべて削除され、撮影とテーマの設定もバックアップの内容に変わります。
-          </p>
+          <p>元のデータは削除され、全て置き換わります。</p>
           {busy && <p className="muted small">読み込んでいます…</p>}
         </Dialog>
       )}
