@@ -24,7 +24,6 @@ export async function exportBackup(): Promise<File> {
     theme: s.theme,
     photoFormat: s.photoFormat,
     jpegQuality: s.jpegQuality,
-    mirrorFrontCamera: s.mirrorFrontCamera,
     showGrid: s.showGrid,
     timerSeconds: s.timerSeconds,
   };
