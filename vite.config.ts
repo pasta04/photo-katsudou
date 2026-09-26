@@ -19,11 +19,14 @@ const commit = (process.env.APP_COMMIT ?? process.env.GITHUB_SHA ?? '').slice(0,
 // Dev Container では 0.0.0.0 で待ち受けないとホストのブラウザから届かない（devcontainer.json で指定）。
 // それ以外では従来どおり localhost のみ
 const host = process.env.DEV_SERVER_HOST || undefined;
+// Dev Container（Windows のフォルダーを 9p でマウント）では OS の変更通知が届かず、
+// 保存しても再読み込みされない。その場合はポーリングで変更を検知する（devcontainer.json で指定）
+const usePolling = process.env.DEV_SERVER_POLLING === 'true';
 
 // 配置先のパスに依存しないよう相対パスでビルドする
 export default defineConfig({
   base: './',
-  server: { host },
+  server: { host, watch: usePolling ? { usePolling: true, interval: 300 } : undefined },
   preview: { host },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),

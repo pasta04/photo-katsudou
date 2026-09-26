@@ -6,8 +6,10 @@
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
   ],
-  // 開発サーバー（npm run dev / preview）をコンテナの外から届くアドレスで待ち受ける（vite.config.ts）
-  "containerEnv": { "DEV_SERVER_HOST": "0.0.0.0" },
+  // DEV_SERVER_HOST: 開発サーバー（npm run dev / preview）をコンテナの外から届くアドレスで待ち受ける
+  // DEV_SERVER_POLLING: ファイルの変更をポーリングで検知する（マウント経由では変更通知が届かないため）
+  // どちらも vite.config.ts で読む
+  "containerEnv": { "DEV_SERVER_HOST": "0.0.0.0", "DEV_SERVER_POLLING": "true" },
   "postCreateCommand": "sudo chown node:node node_modules && npm ci",
   // 5173: npm run dev / 4173: npm run preview
   // localhost に転送されるので、ホストのブラウザでカメラ（HTTPS か localhost が必要）が使える
