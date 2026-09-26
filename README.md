@@ -35,6 +35,7 @@ Node.js 22 の環境で `npm ci` まで自動で実行されます。
 
 - `node_modules` はコンテナ内のボリュームに置くため、ホスト側の `node_modules` とは別になります
 - 開発サーバーはコンテナ内では `0.0.0.0` で待ち受けます（環境変数 `DEV_SERVER_HOST`）。コンテナの外では従来どおり `localhost` のみです
+- コンテナ内ではファイルの変更をポーリングで検知します（環境変数 `DEV_SERVER_POLLING`）。マウント経由では OS の変更通知が届かないためです
 - 5173（`npm run dev`）と 4173（`npm run preview`）がホストの `localhost` に転送されるので、ホストのブラウザでカメラも使えます
 - ESLint・Prettier・Vitest の拡張が入り、保存時に Prettier で整形されます
 
