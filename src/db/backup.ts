@@ -59,13 +59,8 @@ export async function readBackup(file: File): Promise<BackupContents> {
   return unpackBackup(new Uint8Array(await file.arrayBuffer()));
 }
 
-/**
- * - merge: 今のデータに加える。同じ素材・フレーム（同じ ID）はバックアップの内容で上書きする
- * - replace: 今の素材・フレームをすべて削除してから読み込む
- */
-export type ImportMode = 'merge' | 'replace';
-
-export async function importBackup(contents: BackupContents, mode: ImportMode): Promise<void> {
+/** 今の素材・フレームをすべて削除し、バックアップの内容に置き換える */
+export async function importBackup(contents: BackupContents): Promise<void> {
   // サムネイルを先に作っておき、保存は 1 回のトランザクションで行う（途中で失敗しても中途半端に残らない）
   const assets: Asset[] = [];
   for (const a of contents.assets) {
@@ -84,14 +79,11 @@ export async function importBackup(contents: BackupContents, mode: ImportMode): 
     images.release();
   }
 
-  const replacedIds =
-    mode === 'replace' ? await db.assets.toCollection().primaryKeys() : assets.map((a) => a.id);
+  const replacedIds = await db.assets.toCollection().primaryKeys();
 
   await db.transaction('rw', db.assets, db.frames, async () => {
-    if (mode === 'replace') {
-      await db.assets.clear();
-      await db.frames.clear();
-    }
+    await db.assets.clear();
+    await db.frames.clear();
     await db.assets.bulkPut(assets);
     await db.frames.bulkPut(frames);
   });
@@ -99,8 +91,7 @@ export async function importBackup(contents: BackupContents, mode: ImportMode): 
   // 画面で使っている読み込み済みの画像を捨て、次に表示するときに読み直させる
   for (const id of new Set([...replacedIds, ...assets.map((a) => a.id)])) forgetImage(id);
 
-  useSettings.getState().set(contents.settings);
-  if (mode === 'replace') useSettings.getState().set({ lastFrameId: null });
+  useSettings.getState().set({ ...contents.settings, lastFrameId: null });
 }
 
 /** フレームのサムネイル作成用に、バックアップ内の画像を読み込む */

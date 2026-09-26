@@ -5,7 +5,6 @@ import {
   BackupFormatError,
   exportBackup,
   importBackup,
-  type ImportMode,
   readBackup,
 } from '../db/backup';
 import { canShareFile, downloadFile, isIOS, shareFile } from '../lib/platform';
@@ -50,11 +49,11 @@ export function BackupSection() {
     }
   };
 
-  const onImport = async (mode: ImportMode) => {
+  const onImport = async () => {
     if (!pending) return;
     setBusy(true);
     try {
-      await importBackup(pending, mode);
+      await importBackup(pending);
       setStatus({
         kind: 'info',
         text: `素材 ${pending.assets.length} 件・フレーム ${pending.frames.length} 件を読み込みました。`,
@@ -103,11 +102,8 @@ export function BackupSection() {
               <button className="button" onClick={() => setPending(null)} disabled={busy}>
                 キャンセル
               </button>
-              <button className="button danger" onClick={() => onImport('replace')} disabled={busy}>
-                置き換える
-              </button>
-              <button className="button primary" onClick={() => onImport('merge')} disabled={busy}>
-                追加する
+              <button className="button danger" onClick={onImport} disabled={busy}>
+                読み込む
               </button>
             </>
           }
@@ -123,16 +119,10 @@ export function BackupSection() {
               </>
             )}
           </p>
-          <ul className="small">
-            <li>
-              <strong>追加する</strong>
-              ：今のデータを残したまま読み込みます。同じ素材・フレームはバックアップの内容で上書きします。
-            </li>
-            <li>
-              <strong>置き換える</strong>：今の素材・フレームをすべて削除してから読み込みます。
-            </li>
-          </ul>
-          <p className="muted small">撮影とテーマの設定もバックアップの内容に変わります。</p>
+          <p>元のデータは削除されます。よろしいですか？</p>
+          <p className="muted small">
+            今の素材・フレームはすべて削除され、撮影とテーマの設定もバックアップの内容に変わります。
+          </p>
           {busy && <p className="muted small">読み込んでいます…</p>}
         </Dialog>
       )}
