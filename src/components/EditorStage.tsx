@@ -3,6 +3,8 @@ import { type RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { Group, Image as KImage, Layer as KLayer, Line, Stage, Transformer } from 'react-konva';
 import { useElementSize } from '../hooks/useElementSize';
 import { containRect, layerBox, type Rect } from '../lib/layout';
+import { getTheme } from '../lib/theme';
+import { useSettings } from '../store/settings';
 import type { Frame, Layer } from '../types';
 import { CameraBackground } from './CameraBackground';
 
@@ -25,6 +27,7 @@ interface Props {
 export function EditorStage(props: Props) {
   const { frame, images, editable, selectedId, onSelect, onChangeLayer, showCamera } = props;
   const [containerRef, size] = useElementSize<HTMLDivElement>();
+  const accent = getTheme(useSettings((s) => s.theme)).colors.accent;
   const rect: Rect = useMemo(() => {
     const r = containRect(
       Math.max(1, size.width - MARGIN * 2),
@@ -152,14 +155,14 @@ export function EditorStage(props: Props) {
               {guides.x && (
                 <Line
                   points={[rect.width / 2, 0, rect.width / 2, rect.height]}
-                  stroke="#ff4fa3"
+                  stroke={accent}
                   dash={[6, 4]}
                 />
               )}
               {guides.y && (
                 <Line
                   points={[0, rect.height / 2, rect.width, rect.height / 2]}
-                  stroke="#ff4fa3"
+                  stroke={accent}
                   dash={[6, 4]}
                 />
               )}
@@ -171,8 +174,8 @@ export function EditorStage(props: Props) {
               enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
               anchorSize={18}
               anchorCornerRadius={9}
-              anchorStroke="#ff4fa3"
-              borderStroke="#ff4fa3"
+              anchorStroke={accent}
+              borderStroke={accent}
               rotateAnchorOffset={36}
               rotationSnaps={[0, 90, 180, 270]}
               rotationSnapTolerance={5}

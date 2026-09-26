@@ -1,5 +1,6 @@
 import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from 'fflate';
 import type { Aspect, Layer } from '../types';
+import { isThemeId, type ThemeId } from './theme';
 
 /**
  * バックアップファイル（zip）の形式。
@@ -35,6 +36,7 @@ export interface BackupFrame {
 
 /** バックアップに含める設定（端末固有のカメラ ID などは含めない） */
 export interface BackupSettings {
+  theme?: ThemeId;
   photoFormat?: 'jpeg' | 'png';
   jpegQuality?: number;
   mirrorFrontCamera?: boolean;
@@ -160,6 +162,7 @@ export function unpackBackup(bytes: Uint8Array): BackupContents {
 function pickSettings(raw: unknown): BackupSettings {
   const s = (raw ?? {}) as Record<string, unknown>;
   const out: BackupSettings = {};
+  if (isThemeId(s.theme)) out.theme = s.theme;
   if (s.photoFormat === 'jpeg' || s.photoFormat === 'png') out.photoFormat = s.photoFormat;
   if (typeof s.jpegQuality === 'number' && s.jpegQuality > 0 && s.jpegQuality <= 1) {
     out.jpegQuality = s.jpegQuality;

@@ -41,7 +41,7 @@ const sample = (): BackupContents => ({
       updatedAt: 2,
     },
   ],
-  settings: { photoFormat: 'png', timerSeconds: 3 },
+  settings: { theme: 'cool', photoFormat: 'png', timerSeconds: 3 },
 });
 
 describe('packBackup / unpackBackup', () => {
@@ -90,6 +90,7 @@ describe('packBackup / unpackBackup', () => {
   it('設定は知っている項目のうち型の合うものだけ取り込む', async () => {
     const contents = sample();
     contents.settings = {
+      theme: 'dark',
       photoFormat: 'gif',
       jpegQuality: 5,
       showGrid: true,
