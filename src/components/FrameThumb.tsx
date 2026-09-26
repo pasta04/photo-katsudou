@@ -1,8 +1,11 @@
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db/db';
 import { useBlobUrl } from '../hooks/useBlobUrl';
 import type { Frame } from '../types';
 
 export function FrameThumb({ frame }: { frame: Frame }) {
-  const url = useBlobUrl(frame.thumbnail);
+  const thumbnail = useLiveQuery(() => db.frameThumbnails.get(frame.id), [frame.id]);
+  const url = useBlobUrl(thumbnail?.blob);
   return (
     <span
       className="thumb checker"

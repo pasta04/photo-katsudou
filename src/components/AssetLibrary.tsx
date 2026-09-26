@@ -40,7 +40,8 @@ export function AssetLibrary({ onPick }: Props) {
 }
 
 export function AssetThumb({ asset }: { asset: Asset }) {
-  const url = useBlobUrl(asset.thumbnail);
+  const image = useLiveQuery(() => db.assetImages.get(asset.id), [asset.id]);
+  const url = useBlobUrl(image?.thumbnail);
   return <span className="thumb checker">{url && <img src={url} alt="" draggable={false} />}</span>;
 }
 
@@ -85,7 +86,8 @@ function AssetUploadButton({ onImported }: { onImported: (assets: Asset[]) => vo
 
 function AssetEditDialog({ asset, onClose }: { asset: Asset; onClose: () => void }) {
   const [name, setName] = useState(asset.name);
-  const url = useBlobUrl(asset.blob);
+  const image = useLiveQuery(() => db.assetImages.get(asset.id), [asset.id]);
+  const url = useBlobUrl(image?.blob);
 
   const save = async () => {
     await renameAsset(asset.id, name.trim() || asset.name);

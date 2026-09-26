@@ -12,9 +12,9 @@ interface Entry {
 const cache = new Map<string, Entry>();
 
 async function load(assetId: string, entry: Entry): Promise<HTMLImageElement> {
-  const asset = await db.assets.get(assetId);
-  if (!asset) throw new Error(`素材が見つかりません: ${assetId}`);
-  entry.url = URL.createObjectURL(asset.blob);
+  const image = await db.assetImages.get(assetId);
+  if (!image) throw new Error(`素材が見つかりません: ${assetId}`);
+  entry.url = URL.createObjectURL(image.blob);
   const img = new Image();
   img.src = entry.url;
   await img.decode();

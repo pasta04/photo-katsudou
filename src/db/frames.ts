@@ -31,8 +31,11 @@ export async function createFrame(name: string, aspect: Aspect, baseAsset?: Asse
     ? [newLayer(baseAsset, aspect, { width: fitWidth(baseAsset, aspect) })]
     : [];
   const frame: Frame = { id: newId(), name, aspect, layers, createdAt: now, updatedAt: now };
-  frame.thumbnail = await thumbnailFor(frame);
-  await db.frames.add(frame);
+  const thumbnail = await thumbnailFor(frame);
+  await db.transaction('rw', db.frames, db.frameThumbnails, async () => {
+    await db.frames.add(frame);
+    await db.frameThumbnails.add({ id: frame.id, blob: thumbnail });
+  });
   return frame;
 }
 
@@ -43,21 +46,30 @@ async function thumbnailFor(frame: Pick<Frame, 'aspect' | 'layers'>): Promise<Bl
 
 /** 編集内容を保存する（サムネイルも作り直す） */
 export async function saveFrame(frame: Frame): Promise<void> {
+  // サムネイルは新しく作った Blob で置き換える（IndexedDB から読んだ Blob は書き戻さない）
   const thumbnail = await thumbnailFor(frame);
-  await db.frames.put({ ...frame, thumbnail, updatedAt: Date.now() });
+  await db.transaction('rw', db.frames, db.frameThumbnails, async () => {
+    await db.frames.put({ ...frame, updatedAt: Date.now() });
+    await db.frameThumbnails.put({ id: frame.id, blob: thumbnail });
+  });
 }
 
 export async function duplicateFrame(frameId: string): Promise<void> {
   const frame = await db.frames.get(frameId);
   if (!frame) return;
   const now = Date.now();
-  await db.frames.add({
+  const copy: Frame = {
     ...frame,
     id: newId(),
     name: `${frame.name} のコピー`,
     layers: frame.layers.map((l) => ({ ...l, id: newId() })),
     createdAt: now,
     updatedAt: now,
+  };
+  const thumbnail = await thumbnailFor(copy);
+  await db.transaction('rw', db.frames, db.frameThumbnails, async () => {
+    await db.frames.add(copy);
+    await db.frameThumbnails.add({ id: copy.id, blob: thumbnail });
   });
 }
 
@@ -66,5 +78,8 @@ export async function renameFrame(frameId: string, name: string): Promise<void> 
 }
 
 export async function deleteFrame(frameId: string): Promise<void> {
-  await db.frames.delete(frameId);
+  await db.transaction('rw', db.frames, db.frameThumbnails, async () => {
+    await db.frames.delete(frameId);
+    await db.frameThumbnails.delete(frameId);
+  });
 }
