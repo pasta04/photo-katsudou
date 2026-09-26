@@ -22,7 +22,7 @@ export function AssetLibrary({ onPick }: Props) {
       <AssetUploadButton onImported={(list) => list.length === 1 && onPick?.(list[0])} />
       {assets?.length === 0 && (
         <p className="empty">
-          まだ素材がありません。フレームにしたい画像（透過 PNG など）を追加してください。
+          まだ素材がありません。
         </p>
       )}
       <ul className="asset-grid">

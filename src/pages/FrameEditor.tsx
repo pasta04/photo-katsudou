@@ -265,7 +265,7 @@ function FrameSettingsDialog({
         <span className="field-label">比率</span>
         <AspectPicker value={aspect} onChange={setAspect} />
         <p className="muted small">
-          比率を変えても素材は歪みませんが、位置は比率に合わせて移動します。
+          比率を変えると、比率に合わせて素材が移動します。
         </p>
       </div>
     </Dialog>

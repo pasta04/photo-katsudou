@@ -97,7 +97,7 @@ export function LayerPanel(props: Props) {
       )}
 
       <div className="layer-list-header">
-        <span>レイヤー（上ほど前面）</span>
+        <span>上のものが前面に表示されます</span>
         <button className="button small primary" onClick={onAdd}>
           <Plus />
           素材を追加
