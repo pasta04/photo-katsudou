@@ -51,16 +51,21 @@
 ## データモデル（IndexedDB）
 
 ```ts
-// 画像素材
+// 画像素材（画像データは AssetImage に分ける）
 interface Asset {
   id: string;
   name: string;
-  blob: Blob; // 取り込み時に長辺 4096px 上限へ縮小。PNG/WebP は透過保持
   mimeType: string;
   width: number; // px（縮小後）
   height: number;
-  thumbnail: Blob; // 一覧表示用
   createdAt: number;
+}
+
+// 素材の画像データ（id は素材 ID）。登録後は書き換えない
+interface AssetImage {
+  id: string;
+  blob: Blob; // 取り込み時に長辺 4096px 上限へ縮小。PNG/WebP は透過保持
+  thumbnail: Blob; // 一覧表示用
 }
 
 // フレーム
@@ -69,10 +74,19 @@ interface Frame {
   name: string;
   aspect: { w: number; h: number }; // 例: {w: 3, h: 4} / 素材由来なら {w: 811, h: 1182}
   layers: Layer[]; // 配列の先頭が最背面
-  thumbnail: Blob;
   createdAt: number;
   updatedAt: number;
 }
+
+// フレームのサムネイル（id はフレーム ID）。保存のたびに新しく作った画像で置き換える
+interface FrameThumbnail {
+  id: string;
+  blob: Blob;
+}
+
+// 画像データを名前などと分けるのは、名前の変更で画像データを書き戻さないため。
+// iOS Safari（WebKit）では、IndexedDB から読み出した Blob を持つレコードを上書きすると、
+// それまでに読み出していた Blob が読めなくなる（Dexie のキャッシュに残った Blob も含む）。
 
 // レイヤー（座標はすべてフレームに対する割合）
 interface Layer {

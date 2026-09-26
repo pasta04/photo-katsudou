@@ -8,7 +8,7 @@ import {
 import { fileTimestamp } from '../lib/fileName';
 import { renderFrameThumbnail } from '../lib/render';
 import { useSettings } from '../store/settings';
-import type { Asset, Frame } from '../types';
+import type { Asset, AssetImage, Frame, FrameThumbnail } from '../types';
 import { makeAssetThumbnail } from './assets';
 import { db } from './db';
 import { forgetImage } from './imageCache';
@@ -18,7 +18,12 @@ export type { BackupContents } from '../lib/backupFormat';
 
 /** 素材・フレーム・撮影設定を 1 つの zip ファイルに書き出す */
 export async function exportBackup(): Promise<File> {
-  const [assets, frames] = await Promise.all([db.assets.toArray(), db.frames.toArray()]);
+  const [assets, images, frames] = await Promise.all([
+    db.assets.toArray(),
+    db.assetImages.toArray(),
+    db.frames.toArray(),
+  ]);
+  const blobs = new Map(images.map((i) => [i.id, i.blob]));
   const s = useSettings.getState();
   const settings: BackupSettings = {
     theme: s.theme,
@@ -30,15 +35,11 @@ export async function exportBackup(): Promise<File> {
   const bytes = await packBackup({
     appVersion: APP_VERSION,
     exportedAt: new Date().toISOString(),
-    assets: assets.map(({ id, name, mimeType, width, height, createdAt, blob }) => ({
-      id,
-      name,
-      mimeType,
-      width,
-      height,
-      createdAt,
-      blob,
-    })),
+    // 画像データのない素材は表示も撮影もできないので書き出さない
+    assets: assets.flatMap(({ id, name, mimeType, width, height, createdAt }) => {
+      const blob = blobs.get(id);
+      return blob ? [{ id, name, mimeType, width, height, createdAt, blob }] : [];
+    }),
     frames: frames.map(({ id, name, aspect, layers, createdAt, updatedAt }) => ({
       id,
       name,
@@ -63,16 +64,19 @@ export async function readBackup(file: File): Promise<BackupContents> {
 export async function importBackup(contents: BackupContents): Promise<void> {
   // サムネイルを先に作っておき、保存は 1 回のトランザクションで行う（途中で失敗しても中途半端に残らない）
   const assets: Asset[] = [];
-  for (const a of contents.assets) {
-    assets.push({ ...a, thumbnail: await makeAssetThumbnail(a.blob) });
+  const assetImages: AssetImage[] = [];
+  for (const { blob, ...asset } of contents.assets) {
+    assets.push(asset);
+    assetImages.push({ id: asset.id, blob, thumbnail: await makeAssetThumbnail(blob) });
   }
+  const frames: Frame[] = contents.frames;
   const images = await loadImages(contents.assets);
-  let frames: Frame[];
+  let frameThumbnails: FrameThumbnail[];
   try {
-    frames = await Promise.all(
-      contents.frames.map(async (f) => ({
-        ...f,
-        thumbnail: await renderFrameThumbnail(f.aspect, f.layers, images.map),
+    frameThumbnails = await Promise.all(
+      frames.map(async (f) => ({
+        id: f.id,
+        blob: await renderFrameThumbnail(f.aspect, f.layers, images.map),
       })),
     );
   } finally {
@@ -81,11 +85,13 @@ export async function importBackup(contents: BackupContents): Promise<void> {
 
   const replacedIds = await db.assets.toCollection().primaryKeys();
 
-  await db.transaction('rw', db.assets, db.frames, async () => {
-    await db.assets.clear();
-    await db.frames.clear();
+  const tables = [db.assets, db.assetImages, db.frames, db.frameThumbnails];
+  await db.transaction('rw', tables, async () => {
+    await Promise.all(tables.map((t) => t.clear()));
     await db.assets.bulkPut(assets);
+    await db.assetImages.bulkPut(assetImages);
     await db.frames.bulkPut(frames);
+    await db.frameThumbnails.bulkPut(frameThumbnails);
   });
 
   // 画面で使っている読み込み済みの画像を捨て、次に表示するときに読み直させる

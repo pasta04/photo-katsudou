@@ -62,14 +62,15 @@ export async function importAsset(file: File): Promise<Asset> {
     const asset: Asset = {
       id: newId(),
       name: file.name.replace(/\.[^.]+$/, '') || '素材',
-      blob,
       mimeType: blob.type,
       width,
       height,
-      thumbnail,
       createdAt: Date.now(),
     };
-    await db.assets.add(asset);
+    await db.transaction('rw', db.assets, db.assetImages, async () => {
+      await db.assets.add(asset);
+      await db.assetImages.add({ id: asset.id, blob, thumbnail });
+    });
     return asset;
   } finally {
     bitmap.close();
@@ -84,8 +85,9 @@ export async function framesUsingAsset(assetId: string): Promise<string[]> {
 
 /** 素材を削除する。使っているフレームからはそのレイヤーも取り除く */
 export async function deleteAsset(assetId: string): Promise<void> {
-  await db.transaction('rw', db.assets, db.frames, async () => {
+  await db.transaction('rw', db.assets, db.assetImages, db.frames, async () => {
     await db.assets.delete(assetId);
+    await db.assetImages.delete(assetId);
     const frames = await db.frames.toArray();
     for (const frame of frames) {
       if (frame.layers.some((l) => l.assetId === assetId)) {
