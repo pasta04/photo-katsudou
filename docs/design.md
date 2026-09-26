@@ -29,6 +29,9 @@
 - 色・文字色・模様は `src/lib/theme.ts` に定義し、`applyTheme()` が CSS 変数として `:root` に反映する。
 - カメラ・撮影プレビュー・フレーム編集のキャンバスは、写真の色の見え方を優先してテーマによらず暗い配色のまま。
 
+![ホーム画面のテーマ](screenshots/theme-home.png)
+![設定画面のテーマ](screenshots/theme-settings.png)
+
 ## 画面遷移
 
 ```
