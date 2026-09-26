@@ -130,7 +130,7 @@ coverCrop(videoW, videoH, frameAspect)   -> カメラ映像の切り抜き矩形
 - `getUserMedia` は高めの解像度を `ideal` で要求し、実際の `videoWidth/Height` を
   使って cover 切り抜きを計算する（端末の向きで映像が縦横入れ替わっても同じ式で扱える）。
 - `enumerateDevices` で全カメラを列挙し選択可能にする。前面/背面の簡易トグルも置く。
-- 前面カメラは画面表示を鏡像にし、保存画像の鏡像/非鏡像は設定で選ぶ。
+- 前面カメラは画面表示を鏡像にし、保存画像も鏡像のままにする（撮影中に見ていた画とプレビューを一致させる。フレームは反転しない）。
 - 出力解像度: カメラ映像の切り抜き領域の解像度を基準とし、長辺 4096px を上限とする。
 - シャッター → canvas で合成（`src/lib/render.ts` の `composePhoto`）→ Blob → プレビュー。
 - 撮影中は Screen Wake Lock で画面消灯を防ぐ。

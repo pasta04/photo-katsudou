@@ -208,7 +208,9 @@ function Editor({ initial }: { initial: Frame }) {
             </>
           }
         >
-          <p className="muted small">フレーム一覧に戻ってよいですか？保存していない変更は失われます。</p>
+          <p className="muted small">
+            フレーム一覧に戻ってよいですか？保存していない変更は失われます。
+          </p>
         </Dialog>
       )}
       {settingsOpen && (

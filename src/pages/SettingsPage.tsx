@@ -53,18 +53,6 @@ export function SettingsPage() {
               <span className="slider-value">{Math.round(settings.jpegQuality * 100)}</span>
             </label>
           )}
-          <label className="check">
-            <input
-              type="checkbox"
-              checked={settings.mirrorFrontCamera}
-              onChange={(e) => settings.set({ mirrorFrontCamera: e.target.checked })}
-            />
-            <span>
-              前面カメラの写真を画面の見た目どおり（左右反転）で保存する
-              <br />
-              <span className="muted small">フレームの文字などは反転しません。</span>
-            </span>
-          </label>
         </section>
 
         <BackupSection />
