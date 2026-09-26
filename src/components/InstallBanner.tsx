@@ -1,4 +1,4 @@
-import { Smartphone } from 'lucide-react';
+import { CircleHelp, Smartphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isStandalone } from '../lib/platform';
 import { useInstall } from '../store/install';
@@ -14,7 +14,7 @@ export function InstallBanner() {
       <Smartphone className="install-icon" />
       <div>
         <strong>ホーム画面に追加して使ってください</strong>
-        <p>アプリとして全画面で使えるようになり、登録した素材やフレームも消えにくくなります。</p>
+        <p>アプリとして全画面で使えるようになって便利です</p>
         <div className="row">
           {promptEvent && (
             <button className="button primary" onClick={install}>
@@ -22,6 +22,7 @@ export function InstallBanner() {
             </button>
           )}
           <Link className="button" to="/guide">
+            <CircleHelp />
             追加のしかた
           </Link>
         </div>

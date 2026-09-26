@@ -20,12 +20,8 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "vitest.explorer"],
-      "settings": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true,
-        "typescript.tsdk": "node_modules/typescript/lib"
-      }
+      // エディターの設定は .vscode/settings.json にある（コンテナの外でも効くように）
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "vitest.explorer"]
     }
   }
 }

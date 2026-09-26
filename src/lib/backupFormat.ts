@@ -39,7 +39,6 @@ export interface BackupSettings {
   theme?: ThemeId;
   photoFormat?: 'jpeg' | 'png';
   jpegQuality?: number;
-  mirrorFrontCamera?: boolean;
   showGrid?: boolean;
   timerSeconds?: number;
 }
@@ -167,7 +166,6 @@ function pickSettings(raw: unknown): BackupSettings {
   if (typeof s.jpegQuality === 'number' && s.jpegQuality > 0 && s.jpegQuality <= 1) {
     out.jpegQuality = s.jpegQuality;
   }
-  if (typeof s.mirrorFrontCamera === 'boolean') out.mirrorFrontCamera = s.mirrorFrontCamera;
   if (typeof s.showGrid === 'boolean') out.showGrid = s.showGrid;
   if (typeof s.timerSeconds === 'number' && s.timerSeconds >= 0) out.timerSeconds = s.timerSeconds;
   return out;

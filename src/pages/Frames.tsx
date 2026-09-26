@@ -27,7 +27,7 @@ export function Frames() {
       <main className="page">
         <button className="button primary" onClick={() => setCreating(true)}>
           <Plus />
-          新しいフレーム
+          新しいフレームを追加
         </button>
         {frames?.length === 0 && <p className="empty">まだフレームがありません。</p>}
         <ul className="frame-grid">

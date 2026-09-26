@@ -10,8 +10,6 @@ interface SettingsState {
   photoFormat: PhotoFormat;
   /** JPEG の画質 0〜1 */
   jpegQuality: number;
-  /** 前面カメラの映像を画面の見た目どおり（左右反転）で保存するか */
-  mirrorFrontCamera: boolean;
   showGrid: boolean;
   /** セルフタイマー秒数。0 は無効 */
   timerSeconds: number;
@@ -27,7 +25,6 @@ export const useSettings = create<SettingsState>()(
       theme: DEFAULT_THEME,
       photoFormat: 'jpeg',
       jpegQuality: 0.92,
-      mirrorFrontCamera: true,
       showGrid: false,
       timerSeconds: 0,
       lastFrameId: null,

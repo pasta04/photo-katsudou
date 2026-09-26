@@ -57,7 +57,8 @@ export function CameraPage() {
       aspect,
       layers,
       images,
-      mirror: front && settings.mirrorFrontCamera,
+      // 前面カメラは画面の見た目（鏡像）のまま保存する。撮影中に見ていた画とプレビューを一致させるため
+      mirror: front,
     });
     const png = settings.photoFormat === 'png';
     const blob = await canvasToBlob(canvas, png ? 'image/png' : 'image/jpeg', settings.jpegQuality);

@@ -68,6 +68,7 @@ export function NewFrameDialog({ onClose, onCreated }: Props) {
           onChange={(e) => setName(e.target.value)}
         />
       </label>
+      <p>作成するフレームの比率を選択してね。</p>
 
       <div className="segmented">
         <button className={source === 'asset' ? 'selected' : ''} onClick={() => setSource('asset')}>
@@ -83,10 +84,7 @@ export function NewFrameDialog({ onClose, onCreated }: Props) {
 
       {source === 'asset' ? (
         <div className="stack">
-          <p className="muted">
-            完成済みのフレーム画像を 1
-            枚使う場合はこちら。画像と同じ比率のフレームを作り、画像を全面に配置します。
-          </p>
+          <p className="muted">完成済みのフレーム画像を使うときはこちら。</p>
           <button className="asset-choice" onClick={() => setPicking(true)}>
             {asset ? (
               <>
@@ -104,7 +102,6 @@ export function NewFrameDialog({ onClose, onCreated }: Props) {
         </div>
       ) : (
         <div className="stack">
-          <p className="muted">空のフレームを作ります。素材はフレーム編集画面で追加できます。</p>
           <AspectPicker value={aspect} onChange={setAspect} />
         </div>
       )}

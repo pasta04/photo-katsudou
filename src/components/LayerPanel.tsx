@@ -5,8 +5,6 @@ import {
   Copy,
   Eye,
   EyeOff,
-  FlipHorizontal2,
-  FlipVertical2,
   Lock,
   LockOpen,
   Maximize,
@@ -17,11 +15,11 @@ import type { ReactNode } from 'react';
 import { db } from '../db/db';
 import type { Layer } from '../types';
 import { AssetThumb } from './AssetLibrary';
+import { FlipHorizontalIcon, FlipVerticalIcon } from './icons';
 
 interface Props {
   layers: Layer[];
   selectedId: string | null;
-  editable: boolean;
   onSelect: (id: string) => void;
   onChange: (id: string, patch: Partial<Layer>, coalesce?: string) => void;
   onMove: (id: string, direction: 1 | -1) => void;
@@ -32,15 +30,17 @@ interface Props {
 }
 
 export function LayerPanel(props: Props) {
-  const { layers, selectedId, editable, onSelect, onChange, onAdd } = props;
+  const { layers, selectedId, onSelect, onChange, onAdd } = props;
   const assets = useLiveQuery(() => db.assets.toArray(), []);
   const assetMap = new Map(assets?.map((a) => [a.id, a]));
   const selected = layers.find((l) => l.id === selectedId);
   const selectedIndex = selected ? layers.indexOf(selected) : -1;
+  // ロック中は見た目を変える操作（反転・大きさ・削除・不透明度）を受け付けない。重なり順と複製は変えられる
+  const locked = selected?.locked ?? false;
 
   return (
     <aside className="layer-panel">
-      {editable && selected && (
+      {selected && (
         <div className="layer-tools">
           <div className="tool-row">
             <IconButton
@@ -60,22 +60,28 @@ export function LayerPanel(props: Props) {
             <IconButton
               label="左右反転"
               onClick={() => onChange(selected.id, { flipX: !selected.flipX })}
+              disabled={locked}
             >
-              <FlipHorizontal2 />
+              <FlipHorizontalIcon />
             </IconButton>
             <IconButton
               label="上下反転"
               onClick={() => onChange(selected.id, { flipY: !selected.flipY })}
+              disabled={locked}
             >
-              <FlipVertical2 />
+              <FlipVerticalIcon />
             </IconButton>
-            <IconButton label="フレームに合わせる" onClick={() => props.onFit(selected.id)}>
+            <IconButton
+              label="フレームに合わせる"
+              onClick={() => props.onFit(selected.id)}
+              disabled={locked}
+            >
               <Maximize />
             </IconButton>
             <IconButton label="複製" onClick={() => props.onDuplicate(selected.id)}>
               <Copy />
             </IconButton>
-            <IconButton label="削除" onClick={() => props.onRemove(selected.id)}>
+            <IconButton label="削除" onClick={() => props.onRemove(selected.id)} disabled={locked}>
               <Trash2 />
             </IconButton>
           </div>
@@ -87,6 +93,7 @@ export function LayerPanel(props: Props) {
               max={1}
               step={0.01}
               value={selected.opacity}
+              disabled={locked}
               onChange={(e) =>
                 onChange(selected.id, { opacity: Number(e.target.value) }, `opacity:${selected.id}`)
               }
@@ -97,7 +104,7 @@ export function LayerPanel(props: Props) {
       )}
 
       <div className="layer-list-header">
-        <span>レイヤー（上ほど前面）</span>
+        <span>上のものが前面に表示されます</span>
         <button className="button small primary" onClick={onAdd}>
           <Plus />
           素材を追加

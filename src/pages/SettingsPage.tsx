@@ -30,13 +30,13 @@ export function SettingsPage() {
         <section>
           <h2>保存する写真</h2>
           <label className="field">
-            <span>形式</span>
+            <span>ファイル形式</span>
             <select
               value={settings.photoFormat}
               onChange={(e) => settings.set({ photoFormat: e.target.value as 'jpeg' | 'png' })}
             >
-              <option value="jpeg">JPEG（ファイルが小さい）</option>
-              <option value="png">PNG（劣化なし・ファイルが大きい）</option>
+              <option value="jpeg">JPEG</option>
+              <option value="png">PNG</option>
             </select>
           </label>
           {settings.photoFormat === 'jpeg' && (
@@ -53,18 +53,6 @@ export function SettingsPage() {
               <span className="slider-value">{Math.round(settings.jpegQuality * 100)}</span>
             </label>
           )}
-          <label className="check">
-            <input
-              type="checkbox"
-              checked={settings.mirrorFrontCamera}
-              onChange={(e) => settings.set({ mirrorFrontCamera: e.target.checked })}
-            />
-            <span>
-              前面カメラの写真を画面の見た目どおり（左右反転）で保存する
-              <br />
-              <span className="muted small">フレームの文字などは反転しません。</span>
-            </span>
-          </label>
         </section>
 
         <BackupSection />

@@ -12,7 +12,6 @@ export function Assets() {
         </Link>
       </TopBar>
       <main className="page">
-        <p className="muted">タップすると名前の変更・削除ができます。</p>
         <AssetLibrary />
       </main>
     </div>
