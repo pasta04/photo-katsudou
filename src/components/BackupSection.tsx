@@ -70,18 +70,14 @@ export function BackupSection() {
   return (
     <section>
       <h2>バックアップ</h2>
-      <p className="muted small">
-        素材・フレーム・撮影とテーマの設定を 1
-        つのファイル（zip）に書き出します。機種変更のときや、ブラウザのデータが消えたときに読み込んで元に戻せます。
-      </p>
       <div className="row">
         <button className="button" onClick={onExport} disabled={busy}>
           <Download />
-          書き出す
+          エクスポート
         </button>
         <button className="button" onClick={() => inputRef.current?.click()} disabled={busy}>
           <Upload />
-          読み込む
+          インポート
         </button>
         <input
           ref={inputRef}
