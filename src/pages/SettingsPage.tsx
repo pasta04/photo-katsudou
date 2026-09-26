@@ -30,13 +30,13 @@ export function SettingsPage() {
         <section>
           <h2>保存する写真</h2>
           <label className="field">
-            <span>形式</span>
+            <span>ファイル形式</span>
             <select
               value={settings.photoFormat}
               onChange={(e) => settings.set({ photoFormat: e.target.value as 'jpeg' | 'png' })}
             >
-              <option value="jpeg">JPEG（ファイルが小さい）</option>
-              <option value="png">PNG（劣化なし・ファイルが大きい）</option>
+              <option value="jpeg">JPEG</option>
+              <option value="png">PNG</option>
             </select>
           </label>
           {settings.photoFormat === 'jpeg' && (

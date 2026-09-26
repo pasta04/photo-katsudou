@@ -85,9 +85,6 @@ export function LayerPanel(props: Props) {
               <Trash2 />
             </IconButton>
           </div>
-          {locked && (
-            <p className="muted small locked-note">ロック中は位置や見た目を変えられません。</p>
-          )}
           <label className="slider">
             <span>不透明度</span>
             <input
