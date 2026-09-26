@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BackupSection } from '../components/BackupSection';
+import { ThemePicker } from '../components/ThemePicker';
 import { TopBar } from '../components/TopBar';
 import { db } from '../db/db';
 import { versionLabel } from '../lib/appInfo';
@@ -21,6 +22,11 @@ export function SettingsPage() {
     <div className="page-with-bar">
       <TopBar title="設定" />
       <main className="page settings">
+        <section>
+          <h2>テーマ</h2>
+          <ThemePicker />
+        </section>
+
         <section>
           <h2>保存する写真</h2>
           <label className="field">

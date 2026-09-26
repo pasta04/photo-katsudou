@@ -1,19 +1,24 @@
 :root {
-  --bg: #121214;
-  --surface: #1e1e22;
-  --surface-2: #2a2a30;
-  --border: #3a3a42;
-  --text: #f2f2f5;
-  --muted: #a0a0ab;
-  --accent: #ff4fa3;
+  /* 色は src/lib/theme.ts の applyTheme() がテーマに合わせて上書きする */
+  --bg: #fff;
+  --surface: #fff;
+  --surface-2: #f2f2f5;
+  --border: #d8d8de;
+  --text: #333;
+  --muted: #777;
+  --accent: #e2607f;
   --accent-text: #fff;
-  --danger: #ff5a5a;
+  --hero-from: var(--accent);
+  --hero-to: var(--accent);
+  --hero-text: var(--accent-text);
+  --danger: #d23b4b;
+  --pattern: none;
   --radius: 12px;
   --safe-top: env(safe-area-inset-top);
   --safe-right: env(safe-area-inset-right);
   --safe-bottom: env(safe-area-inset-bottom);
   --safe-left: env(safe-area-inset-left);
-  color-scheme: dark;
+  color-scheme: light;
   font-family:
     system-ui,
     -apple-system,
@@ -38,7 +43,10 @@ body,
 }
 
 body {
-  background: var(--bg);
+  background-color: var(--bg);
+  /* テーマのマーク（ハート・ダイヤ・スペード・クローバー）を敷き詰める */
+  background-image: var(--pattern);
+  background-size: 112px 112px;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
@@ -102,6 +110,20 @@ svg {
   color: var(--muted);
   text-align: center;
   padding: 24px 0;
+}
+
+/* カメラ・撮影プレビュー・編集キャンバスは写真の見え方を優先して、テーマによらず暗くする */
+.camera,
+.photo-preview,
+.editor-main {
+  color-scheme: dark;
+  --surface: #1e1e22;
+  --surface-2: #2a2a30;
+  --border: #3a3a42;
+  --text: #f2f2f5;
+  --muted: #a0a0ab;
+  --danger: #ff6b6b;
+  color: var(--text);
 }
 
 /* ---------- ボタン ---------- */
@@ -199,6 +221,12 @@ button {
   background: var(--accent);
   color: var(--accent-text);
   font-weight: 600;
+}
+.theme-picker button:not(.selected) svg {
+  color: var(--suit);
+}
+.theme-picker button svg {
+  fill: currentColor;
 }
 
 /* ---------- フォーム ---------- */
@@ -355,11 +383,12 @@ button {
   margin-top: 2px;
 }
 .home-card.primary {
-  background: linear-gradient(135deg, #ff4fa3, #7a5cff);
+  background: linear-gradient(135deg, var(--hero-from), var(--hero-to));
   border: none;
+  color: var(--hero-text);
 }
 .home-card.primary > svg {
-  color: #fff;
+  color: var(--hero-text);
 }
 .home-card strong {
   font-size: 1.1rem;
@@ -519,6 +548,7 @@ button {
   border-radius: 50%;
   border: none;
   background: rgb(0 0 0 / 55%);
+  color: #fff;
   cursor: pointer;
   font-weight: bold;
 }

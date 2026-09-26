@@ -21,6 +21,7 @@ export async function exportBackup(): Promise<File> {
   const [assets, frames] = await Promise.all([db.assets.toArray(), db.frames.toArray()]);
   const s = useSettings.getState();
   const settings: BackupSettings = {
+    theme: s.theme,
     photoFormat: s.photoFormat,
     jpegQuality: s.jpegQuality,
     mirrorFrontCamera: s.mirrorFrontCamera,

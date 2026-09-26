@@ -13,7 +13,7 @@ import { Dialog } from './Dialog';
 
 type Status = { kind: 'info' | 'error'; text: string } | null;
 
-/** 設定画面の「バックアップ」欄。素材・フレーム・撮影設定の書き出しと読み込み */
+/** 設定画面の「バックアップ」欄。素材・フレーム・設定の書き出しと読み込み */
 export function BackupSection() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<Status>(null);
@@ -71,7 +71,7 @@ export function BackupSection() {
     <section>
       <h2>バックアップ</h2>
       <p className="muted small">
-        素材・フレーム・撮影の設定を 1
+        素材・フレーム・撮影とテーマの設定を 1
         つのファイル（zip）に書き出します。機種変更のときや、ブラウザのデータが消えたときに読み込んで元に戻せます。
       </p>
       <div className="row">
@@ -136,7 +136,7 @@ export function BackupSection() {
               <strong>置き換える</strong>：今の素材・フレームをすべて削除してから読み込みます。
             </li>
           </ul>
-          <p className="muted small">撮影の設定もバックアップの内容に変わります。</p>
+          <p className="muted small">撮影とテーマの設定もバックアップの内容に変わります。</p>
           {busy && <p className="muted small">読み込んでいます…</p>}
         </Dialog>
       )}
